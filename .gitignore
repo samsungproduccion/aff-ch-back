@@ -1,0 +1,13 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Keep environment variables out of version control
+.env
+
+/out
+/dist
+
+.DS_Store
+*.pem

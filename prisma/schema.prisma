@@ -1,0 +1,302 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("RELATIONAL_DATABASE_URL")
+}
+
+model Module {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(30)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now()) @db.DateTime
+  createdBy Int?
+  updatedAt DateTime? @default(now()) @db.DateTime
+  updatedBy Int?
+  slug      String    @db.VarChar(30)
+  products  Product[]
+  roles     Roles[]
+  users     Users[]
+}
+
+model Menu {
+  id        Int            @id @default(autoincrement())
+  name      String         @db.VarChar(100)
+  slug      String         @unique @db.VarChar(100)
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedBy Int?
+  createdBy Int?
+  type      String         @db.VarChar(20)
+  updatedAt DateTime?      @default(now())
+  order     Int            @default(0)
+  roles     RolesOnMenus[]
+}
+
+model Roles {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(30)
+  slug         String         @db.VarChar(30)
+  menus        String         @db.VarChar(250)
+  moduleId     Int?
+  authSettings AuthSetting?
+  module       Module?        @relation(fields: [moduleId], references: [id], onUpdate: NoAction)
+  menu         RolesOnMenus[]
+  user         Users[]
+}
+
+model RolesOnMenus {
+  menuId    Int
+  rolId     Int
+  createdAt DateTime @default(now())
+  createdBy Int?
+  menu      Menu     @relation(fields: [menuId], references: [id])
+  rol       Roles    @relation(fields: [rolId], references: [id])
+
+  @@id([menuId, rolId])
+}
+
+model AuthSetting {
+  id             Int     @id @default(autoincrement())
+  pwdExpiration  Int     @default(90)
+  pwdMinLenght   Int     @default(8)
+  pwdComplexity  Boolean @default(true)
+  maxAttempts    Int     @default(5)
+  isRestricted   Boolean @default(true)
+  rolId          Int     @unique
+  mfa            Boolean @default(true)
+  mfaExpiration  Int     @default(5)
+  loginBlockTime Int     @default(5)
+  rol            Roles   @relation(fields: [rolId], references: [id], onDelete: Cascade)
+}
+
+model MultiFactorAuth {
+  id        Int      @id @default(autoincrement())
+  token     String   @db.VarChar(500)
+  email     String   @db.VarChar(100)
+  code      String   @db.VarChar(30)
+  type      String   @db.VarChar(20)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.DateTime
+  userId    Int
+}
+
+model Users {
+  id             Int             @id @default(autoincrement())
+  name           String          @db.VarChar(1000)
+  lastName       String          @db.VarChar(1000)
+  email          String          @unique @db.VarChar(100)
+  password       String          @db.VarChar(250)
+  phone          String          @db.VarChar(1000)
+  dni            String          @db.VarChar(1000)
+  country        String?         @db.VarChar(30)
+  address1       String          @db.VarChar(1000)
+  address2       String?         @default("") @db.VarChar(1000)
+  image          String?         @default("", map: "DF_Users_image") @db.VarChar(1000)
+  role           String          @db.VarChar(10)
+  rolId          Int
+  status         String          @default("P", map: "DF__Users__status__160F4887")
+  approval       Int
+  isActive       Boolean         @default(true)
+  isObserved     Boolean         @default(false)
+  isSpecial      Boolean         @default(false)
+  createdAt      DateTime        @default(now(), map: "DF__Users__createdAt__17036CC0")
+  code           String?         @db.VarChar(20)
+  moduleId       Int
+  attemps        Int             @default(0)
+  lastPwdChange  DateTime        @default(now())
+  lastLoginTry   DateTime        @default(now())
+  isLoginActive  Boolean         @default(true)
+  updatedAt      DateTime?
+  codes          Code[]
+  PageTracking   PageTracking[]
+  representative Representative?
+  userInfo       UserInfo?
+  module         Module          @relation(fields: [moduleId], references: [id])
+  roles          Roles           @relation(fields: [rolId], references: [id], onUpdate: NoAction)
+}
+
+model UserInfo {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  rucNumber    String?  @db.VarChar(250)
+  rucDoc       String?  @db.VarChar(250)
+  bankDoc      String?  @db.VarChar(250)
+  bankNumber   String?  @db.VarChar(250)
+  validityCert String?  @db.VarChar(250)
+  dniDoc       String?  @db.VarChar(250)
+  checkInfo    Boolean? @default(false)
+  checkPrivacy Boolean  @default(false)
+  checkTerms   Boolean  @default(false)
+  comment      String?  @db.VarChar(250)
+  contract     String?  @db.VarChar(250)
+  user         Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Representative {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  name         String   @db.VarChar(250)
+  lastName     String   @db.VarChar(250)
+  email        String   @db.VarChar(250)
+  phone        String   @db.VarChar(250)
+  dni          String   @db.VarChar(250)
+  rucNumber    String   @db.VarChar(250)
+  bankNumber   String   @db.VarChar(250)
+  dniDoc       String?  @db.VarChar(250)
+  rucDoc       String?  @db.VarChar(250)
+  bankDoc      String?  @db.VarChar(250)
+  validityCert String?  @db.VarChar(250)
+  contract     String?  @db.VarChar(250)
+  createdAt    DateTime @default(now())
+  user         Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ResetPassword {
+  id        Int       @id @default(autoincrement())
+  token     String?   @db.VarChar(500)
+  email     String?   @db.VarChar(50)
+  createdAt DateTime? @default(now(), map: "DF_ResetPassword_createdAt") @db.DateTime
+  status    Boolean?
+}
+
+model Product {
+  id          Int                    @id @default(autoincrement())
+  sku         String                 @db.VarChar(30)
+  name        String                 @db.VarChar(100)
+  description String?                @db.VarChar(500)
+  image       String                 @db.VarChar(250)
+  url_page    String                 @db.VarChar(250)
+  url_shop    String?                @db.VarChar(250)
+  price       Float
+  isActive    Boolean                @default(true)
+  createdAt   DateTime               @default(now()) @db.DateTime
+  createdBy   Int
+  updatedAt   DateTime?              @default(now()) @db.DateTime
+  updatedBy   Int?
+  priceOld    Float?
+  moduleId    Int
+  categories  CategoriesOnProducts[]
+  module      Module                 @relation(fields: [moduleId], references: [id])
+  benefits    ProductBenefit[]
+}
+
+model Category {
+  id        Int                    @id @default(autoincrement())
+  name      String                 @db.VarChar(50)
+  slug      String                 @unique @db.VarChar(20)
+  createdAt DateTime               @default(now())
+  createdBy Int?
+  products  CategoriesOnProducts[]
+}
+
+model ProductBenefit {
+  id        Int      @id(map: "Product_Benefit_pkey") @default(autoincrement())
+  name      String   @db.VarChar(100)
+  quantity  Float
+  type      String   @db.VarChar(30)
+  productId Int
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now(), map: "Product_Benefit_createdAt_df")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade, map: "Product_Benefit_productId_fkey")
+}
+
+model CategoriesOnProducts {
+  productId  Int
+  categoryId Int
+  createdAt  DateTime @default(now())
+  createdBy  Int?
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+model Benefit {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+  createdBy Int
+  isActive  Boolean  @default(true)
+}
+
+model Code {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique @db.VarChar(30)
+  userId    Int?
+  available Boolean  @default(true)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  createdBy Int
+  user      Users?   @relation(fields: [userId], references: [id], onUpdate: NoAction)
+}
+
+model Resources {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(100)
+  url       String   @db.VarChar(250)
+  type      String   @db.VarChar(100)
+  tags      String   @db.VarChar(1000)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id            Int       @id @default(autoincrement())
+  totalAmount   Float
+  orderAmount   Int
+  affiliateCode String
+  operationDate DateTime
+  sku           String?
+  subTotal      Float?
+  total         Float?
+  paymentType   String?
+  status        String?
+  discount      Float?
+  coupon        String?
+  createdBy     Int
+  createdAt     DateTime  @default(now())
+  clientName    String?
+  isActive      Boolean   @default(true)
+  updatedAt     DateTime?
+  updatedBy     Int?
+}
+
+model Seed {
+  id        Int      @id @default(autoincrement())
+  name      String
+  hasDone   Boolean
+  createdAt DateTime @default(now())
+}
+
+model UserHistory {
+  id        Int      @id @default(autoincrement())
+  tableName String   @db.VarChar(100)
+  action    String   @db.VarChar(30)
+  email     String   @db.VarChar(100)
+  code      String   @db.VarChar(30)
+  createdBy Int
+  createdAt DateTime @default(now())
+}
+
+model PageTracking {
+  id         Int       @id(map: "PK_PageTracking") @default(autoincrement())
+  page       String    @db.VarChar(50)
+  parameters String?   @db.VarChar(Max)
+  createdAt  DateTime? @default(now(), map: "DF_PageTracking_createdBy") @db.DateTime
+  idUser     Int?
+  Users      Users?    @relation(fields: [idUser], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_PageTracking_Users")
+}
+
+model CodeHistory {
+  id        Int      @id @default(autoincrement())
+  code      String   @db.VarChar(30)
+  action    String   @db.VarChar(30)
+  email    String   @db.VarChar(100)
+  userId    Int
+  createdAt DateTime @default(now())
+  createdBy Int
+}
