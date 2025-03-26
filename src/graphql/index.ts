@@ -2,7 +2,7 @@ import { mergeSchemas } from "@graphql-tools/schema";
 import {authSchema} from "./auth";
 import { codesSchema } from "./codes";
 import { productSchema } from "./product";
-import { resourceSchema } from "./rosources";
+import { resourceSchema } from "./resources";
 import { transactionSchema } from "./transaction";
 import { userSchema } from "./user";
 import { benefitSchema } from "./benefit";

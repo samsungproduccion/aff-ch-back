@@ -50,6 +50,10 @@ export async function startApolloServer() {
     })
   );
 
+  // app.get('/images', (req, res) => {
+  //   res.json({ message: 'This is a REST endpoint!' });
+  // });
+
   // Modified server startup
   await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
   console.log(`🚀 Server ready at http://localhost:${port}/`);

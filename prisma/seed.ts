@@ -5,11 +5,13 @@ import { roles } from './data/roles';
 import { menuList } from './data/menu';
 import { benefits } from './data/benefits';
 import { categoryList } from './data/categories';
-const secret = process.env.SECRYPT || '';
+
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const secret = process.env.SECRYPT || '';
+  // console.log({secret})
   const existsRootSeed = await prisma.seed.findFirst({
     where: { name: 'ROOTSEED' },
   });
@@ -84,7 +86,7 @@ async function main() {
 
     await tx.menu.createMany({
       data: menuList,
-    })
+    });
 
     await tx.benefit.createMany({
       data: benefits.map(bf => (

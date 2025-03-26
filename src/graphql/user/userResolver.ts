@@ -12,13 +12,11 @@ import { InputChangeUserDoc, InputChangeUserStatus, InputObserveUser, InputPreAp
 import { observedUser } from '../../utils/mails/observedUser';
 import { userRegistration } from '../../utils/mails/userRegistration';
 
-const secret = process.env.SECRYPT || '';
-
 export const UserResolver: IResolvers = {
   Query: {
     userGetAll: async (_, __, context: IContextApp) => {
       if (!context.user) return null;
-
+      const secret = process.env.SECRYPT || '';
       try {
         const users = await prisma.users.findMany({
           include: {
@@ -69,7 +67,7 @@ export const UserResolver: IResolvers = {
     },
     userGetSelected: async (_, {quantity}: {quantity: number}, context) => {
       if (!context.user) return null;
-
+      const secret = process.env.SECRYPT || '';
       try {
         const users = await prisma.users.findMany({
           include: {
@@ -122,7 +120,7 @@ export const UserResolver: IResolvers = {
     },
     userGetAllCategories: async (_, __, context) => {
       if (!context.user) return null;
-
+      const secret = process.env.SECRYPT || '';
       try {
         const users = await prisma.users.findMany({
           include: {
@@ -170,6 +168,7 @@ export const UserResolver: IResolvers = {
     },
     userGetAllAdmin: async (_, __, context) => {
       if (!context.user || context.user.role!=='ROOT') return null;
+      const secret = process.env.SECRYPT || '';
       try {
         const users = await prisma.users.findMany({
           include: {
@@ -218,6 +217,7 @@ export const UserResolver: IResolvers = {
     userGetAllByStatus: async (_, {approval}:{approval:[number]}, context) => {
       // if (!context.user) return null;
       // let users=null;
+      const secret = process.env.SECRYPT || '';
       try {
         const rol = await prisma.roles.findFirst({
           where:{ slug: 'associate' }
@@ -241,7 +241,7 @@ export const UserResolver: IResolvers = {
             approval: 'desc',
           }
         });
-
+        // console.log(users)
         // if (approval===0) {
         //   users = await prisma.users.findMany({
         //     include: {
@@ -307,6 +307,7 @@ export const UserResolver: IResolvers = {
       if (!context.user) return null;
       // console.log(context.user)
       // console.log(context.user)
+      const secret = process.env.SECRYPT || '';
       try {
         const user= await prisma.users.findUnique({
           where:{
@@ -386,6 +387,7 @@ export const UserResolver: IResolvers = {
     },
     userGetById: async(_, {id}, context:IContextApp) => {
       // if (!context.user) return null;
+      const secret = process.env.SECRYPT || '';
       try {
         const user = await prisma.users.findUnique({
           include: {
@@ -435,6 +437,7 @@ export const UserResolver: IResolvers = {
     },
     userGetMenus: async(_, __, context: IContextApp) => {
       if (!context.user) return null;
+      const secret = process.env.SECRYPT || '';
       try {
         const menus = [];
         // const menus = context.user.roles.menus.split(",") || null;
@@ -447,6 +450,7 @@ export const UserResolver: IResolvers = {
     },
     userGetRoles: async(_, __, context: IContextApp) => {
       if (!context.user || context.user.role!=='ROOT') return null;
+      const secret = process.env.SECRYPT || '';
       try {
         const roles = await prisma.roles.findMany({
           where:{
@@ -465,6 +469,7 @@ export const UserResolver: IResolvers = {
   },
   Mutation: {
     userCreate: async (_, values: ICreateUser) => {
+      const secret = process.env.SECRYPT || '';
       try {
         const {
           name,
@@ -564,6 +569,7 @@ export const UserResolver: IResolvers = {
     },
     userCreateSuper: async (_, values: ICreateSuperUser, context) => {
       if (!context.user || context.user.role!=='ROOT') return null;
+      const secret = process.env.SECRYPT || '';
       try {
         // console.log(values)
         const {
@@ -643,7 +649,7 @@ export const UserResolver: IResolvers = {
     userCreateApproved: async (_, values: ICreateUserApproved, context: IContextApp) => {
       if (!context.user) return null;
       if (context.user.role==='USER') return null;
-
+      const secret = process.env.SECRYPT || '';
       try {
         const {
           user: {
@@ -804,6 +810,7 @@ export const UserResolver: IResolvers = {
     },
     userEdit: async (_, values: IEditUser, context) => {
       if (!context.user) return null;
+      const secret = process.env.SECRYPT || '';
       try {
         // console.log(values)
         const {
@@ -1147,6 +1154,7 @@ export const UserResolver: IResolvers = {
     userChangeStatus: async (_,{ approval, status, id, comment, isSpecial}: InputChangeUserStatus, context: IContextApp) => {
       if (!context.user) return null;
       // console.log({ approval, status, id, comment})
+      const secret = process.env.SECRYPT || '';
       try {
         const existsRole = await prisma.roles.findFirst({
           where: {slug: 'associate'}
@@ -1221,7 +1229,7 @@ export const UserResolver: IResolvers = {
     },
     userAssignSpecialCode: async (_,{ id, code, status}:{id:number,code:string, status: 'A' | 'C'}, context: IContextApp) => {
       if (!context.user) return null;
-      
+      const secret = process.env.SECRYPT || '';
       try {
         const existsRole = await prisma.roles.findFirst({
           where: {slug: 'associate'}
@@ -1376,6 +1384,7 @@ export const UserResolver: IResolvers = {
       }
     },
     userRegister: async (_, values: IRegisterUser) => {
+      const secret = process.env.SECRYPT || '';
       try {
         const {
           name,
@@ -1546,6 +1555,7 @@ export const UserResolver: IResolvers = {
       if (!context.user) return null;
       // console.log({ approval, status, id})
       if(approval!=4 ) return new GraphQLError('No puede realizar esta acción');
+      const secret = process.env.SECRYPT || '';
       try {
         const existsRole = await prisma.roles.findFirst({
           where: {slug: 'associate'}
@@ -1618,6 +1628,7 @@ export const UserResolver: IResolvers = {
       if (!context.user) return null;
       // console.log({ approval, status, id})
       if(approval!=4 ) return new GraphQLError('No puede realizar esta acción');
+      const secret = process.env.SECRYPT || '';
       try {
         const existsRole = await prisma.roles.findFirst({
           where: {slug: 'associate'}
@@ -1667,6 +1678,7 @@ export const UserResolver: IResolvers = {
     userObserved: async (_,{id, comment, isObserved}: InputObserveUser, context: IContextApp) => {
       if (!context.user) return null;
       // console.log({ id, comment, isObserved})
+      const secret = process.env.SECRYPT || '';
       try {
         const existsRole = await prisma.roles.findFirst({
           where: {slug: 'associate'}

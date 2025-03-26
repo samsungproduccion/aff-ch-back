@@ -12,7 +12,6 @@ import { getDaysDiff } from '../../helpers/dates';
 import { validateEmailMFA } from '../../utils/mails/validateEmailMFA';
 import { IValidateMfa } from '../../interfaces/auth.interface';
 
-const secret = process.env.SECRYPT || '';
 
 export const AuthResolver: IResolvers = {
   Query: {
@@ -244,6 +243,7 @@ export const AuthResolver: IResolvers = {
       }
     },
     authRestorePassword: async (_, { email }, __) => {
+      const secret = process.env.SECRYPT || '';
       try {
         // const existRequest = await prisma.resetPassword.findFirst({
         //   where: {
@@ -308,6 +308,7 @@ export const AuthResolver: IResolvers = {
       { token, email, newPassword, repeatPassword },
       __
     ) => {
+      const secret = process.env.SECRYPT || '';
       // console.log({token, email, newPassword, repeatPassword})
       if (!token) return null;
       try {
@@ -359,6 +360,7 @@ export const AuthResolver: IResolvers = {
     },
     authRenewPassword: async (_, { token, oldPassword, newPassword, repeatPassword }, __) => {
       if (!token) return null;
+      const secret = process.env.SECRYPT || '';
       try {
         const userId = verifyJWT(token);
 
