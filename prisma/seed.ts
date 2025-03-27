@@ -29,8 +29,16 @@ async function main() {
       },
     });
     await tx.roles.createMany({
-      data: roles,
+      data: roles.map((role) => ({
+        ...role,
+        moduleId: module.id,
+      })),
     });
+
+    // const activeRoles = await tx.roles.findMany({
+    // });
+
+    // console.log(activeRoles)
 
     const globalRole = await tx.roles.findFirst({
       where: { slug: 'global' },
@@ -78,11 +86,11 @@ async function main() {
       },
     });
 
-    await tx.authSetting.create({
-      data: {
-        rolId: globalRole.id
-      }
-    })
+    // await tx.authSetting.create({
+    //   data: {
+    //     rolId: globalRole.id
+    //   }
+    // })
 
     await tx.menu.createMany({
       data: menuList,
